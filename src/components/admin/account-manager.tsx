@@ -85,6 +85,7 @@ function OwnPasswordForm() {
           type="password"
           required
           placeholder="Contraseña actual"
+          autoComplete="new-password"
         />
       </div>
       <div className="w-full sm:w-auto sm:min-w-40 sm:flex-1">
@@ -95,6 +96,7 @@ function OwnPasswordForm() {
           required
           placeholder="Nueva contraseña"
           minLength={8}
+          autoComplete="new-password"
         />
       </div>
       <Button type="submit" variant="outline" disabled={pending}>
@@ -124,7 +126,7 @@ function CreateForm() {
     >
       <div className="w-full sm:w-auto sm:min-w-40 sm:flex-1">
         <label className="mb-1 block text-sm font-medium">Nueva cuenta</label>
-        <Input name="username" required placeholder="Usuario" minLength={3} />
+        <Input name="username" required placeholder="Usuario" minLength={3} autoComplete="off" />
       </div>
       <div className="w-full sm:w-auto sm:min-w-40 sm:flex-1">
         <label className="mb-1 block text-sm font-medium">Contraseña</label>
@@ -133,6 +135,7 @@ function CreateForm() {
           type="password"
           required
           placeholder="Mínimo 8 caracteres"
+          autoComplete="new-password"
           minLength={8}
         />
       </div>
@@ -211,6 +214,7 @@ function UserRow({ user }: { user: AccountRow }) {
                 required
                 placeholder="Nueva contraseña"
                 minLength={8}
+                autoComplete="new-password"
               />
             </div>
             <Button type="submit" variant="outline" disabled={resetting}>
