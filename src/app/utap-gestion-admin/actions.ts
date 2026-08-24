@@ -16,7 +16,7 @@ import { deleteUpload, saveUpload } from "@/lib/images";
 import { isBlocked, registerFailure, resetFailures } from "@/lib/rate-limit";
 import { ADMIN_PATH } from "@/lib/admin-path";
 
-export type ActionState = { error?: string };
+export type ActionState = { error?: string; ok?: string };
 
 const TIME_REGEX = /^(\d{1,2}):(\d{2})$/;
 
@@ -79,6 +79,53 @@ export async function loginAction(
 export async function logoutAction(): Promise<void> {
   await clearSessionCookie();
   redirect(`${ADMIN_PATH}/login`);
+}
+
+/* ----------------------------- Cuentas ---------------------------- */
+
+// Alta de usuario del panel (hash bcrypt; nunca guardamos texto plano)
+export async function createUserAction(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireSession();
+
+  const username = String(formData.get("username") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+
+  if (username.length < 3) {
+    return { error: "El nombre de usuario necesita al menos 3 caracteres." };
+  }
+  if (password.length < 8) {
+    return { error: "La contraseña necesita al menos 8 caracteres." };
+  }
+
+  try {
+    const passwordHash = await bcrypt.hash(password, 12);
+    await prisma.user.create({ data: { username, passwordHash } });
+  } catch {
+    return { error: `Ya existe una cuenta "${username}".` };
+  }
+
+  revalidatePath(`${ADMIN_PATH}/cuentas`);
+  return { ok: `Cuenta "${username}" creada. Ya puede entrar al panel.` };
+}
+
+// Baja de usuario: revoca el acceso de inmediato
+export async function deleteUserAction(formData: FormData): Promise<void> {
+  const session = await requireSession();
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  // No te podés eliminar a vos mismo (te quedarías afuera sin querer)
+  if (id === session.sub) return;
+
+  // Siempre tiene que quedar al menos una cuenta con acceso
+  const total = await prisma.user.count();
+  if (total <= 1) return;
+
+  await prisma.user.delete({ where: { id } });
+  revalidatePath(`${ADMIN_PATH}/cuentas`);
 }
 
 /* --------------------------- Productos --------------------------- */

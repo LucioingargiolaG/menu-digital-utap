@@ -10,6 +10,7 @@ const links = [
   { href: ADMIN_PATH, label: "Productos" },
   { href: `${ADMIN_PATH}/categorias`, label: "Categorías" },
   { href: `${ADMIN_PATH}/configuracion`, label: "Configuración" },
+  { href: `${ADMIN_PATH}/cuentas`, label: "Cuentas" },
 ];
 
 export function AdminNav() {
