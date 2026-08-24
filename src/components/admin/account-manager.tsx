@@ -2,7 +2,7 @@
 
 // Gestión de cuentas del panel: alta, baja (revocar acceso)
 // y cambio de contraseñas (propia y de otras cuentas).
-import { useActionState } from "react";
+import { useEffect, useRef, useActionState } from "react";
 import { KeyRound, Trash2, UserPlus } from "lucide-react";
 import {
   createUserAction,
@@ -15,6 +15,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const initialState: ActionState = {};
+
+// Limpia el formulario cuando la acción termina bien
+function useFormReset<T>(state: T & { ok?: string }) {
+  const ref = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (state.ok) ref.current?.reset();
+  }, [state.ok]);
+  return ref;
+}
 
 export type AccountRow = {
   id: string;
@@ -61,9 +70,11 @@ function OwnPasswordForm() {
     changeOwnPasswordAction,
     initialState
   );
+  const formRef = useFormReset(state);
 
   return (
     <form
+      ref={formRef}
       action={formAction}
       className="flex flex-wrap items-end gap-3 rounded-2xl border border-border bg-surface p-4 shadow-soft"
     >
@@ -103,9 +114,11 @@ function CreateForm() {
     createUserAction,
     initialState
   );
+  const formRef = useFormReset(state);
 
   return (
     <form
+      ref={formRef}
       action={formAction}
       className="flex flex-wrap items-end gap-3 rounded-2xl border border-border bg-surface p-4 shadow-soft"
     >
@@ -144,6 +157,7 @@ function UserRow({ user }: { user: AccountRow }) {
     resetUserPasswordAction,
     initialState
   );
+  const resetFormRef = useFormReset(resetState);
 
   return (
     <div className="rounded-2xl border border-border bg-surface p-4 shadow-soft">
@@ -188,7 +202,7 @@ function UserRow({ user }: { user: AccountRow }) {
           <summary className="cursor-pointer select-none text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
             Cambiar contraseña
           </summary>
-          <form action={resetFormAction} className="mt-3 flex flex-wrap items-end gap-3">
+          <form ref={resetFormRef} action={resetFormAction} className="mt-3 flex flex-wrap items-end gap-3">
             <input type="hidden" name="id" value={user.id} />
             <div className="w-full sm:w-auto sm:min-w-40 sm:flex-1">
               <Input
