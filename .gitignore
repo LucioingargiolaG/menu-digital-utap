@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prisma
+prisma/dev.db*
+src/generated
+
+# uploads locales (se conservan los directorios con .gitkeep)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# logs locales
+dev-server.log
+
+.vercel
+.env*

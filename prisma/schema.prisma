@@ -1,0 +1,56 @@
+// Esquema de base de datos del menú digital Utap
+// MongoDB Atlas (Prisma 6: el conector Mongo usa url en el datasource)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// Usuario administrador (dueño del local)
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+// Categorías del menú (Papas Fritas, Hamburguesas Simples, etc.)
+model Category {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String    @unique
+  order     Int       @default(0)
+  active    Boolean   @default(true)
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
+// Productos del menú
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String   @default("")
+  price       Int // precio en pesos argentinos (entero)
+  imageUrl    String? // ruta de la imagen, ej: /uploads/xxx.webp (opcional)
+  active      Boolean  @default(true) // visible en el menú público
+  order       Int      @default(0) // orden dentro de la categoría
+  categoryId  String   @db.ObjectId
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId, order])
+}
+
+// Configuración general (fila única, key = "global")
+model Settings {
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  key             String  @unique // siempre "global"
+  orderUrl        String  @default("") // link externo al sistema de pedidos
+  scheduleEnabled Boolean @default(true) // usar horario automático
+  openTime        String  @default("11:00")
+  closeTime       String  @default("23:30")
+  forceClosed     Boolean @default(false) // cerrar manualmente
+}

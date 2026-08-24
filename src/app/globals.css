@@ -1,26 +1,89 @@
 @import "tailwindcss";
 
+/*
+  Tema Utap: fondo crema, cards blancas, acento rojo.
+  Los tokens se exponen a Tailwind vía @theme inline (bg-background, text-primary, etc.)
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f2e5e1;
+  --surface: #ffffff;
+  --foreground: #2a1e1b;
+  --muted: #ead9d4;
+  --muted-foreground: #7d6a65;
+  --border: #e3cfca;
+  --primary: #dc2626;
+  --primary-hover: #b91c1c;
+  --primary-foreground: #ffffff;
+  --success: #16a34a;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-success: var(--success);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Sombra muy suave para las cards */
+.shadow-soft {
+  box-shadow:
+    0 1px 2px rgba(28, 25, 23, 0.04),
+    0 4px 16px rgba(28, 25, 23, 0.05);
+}
+
+/* Fade-in suave del contenido (máx ~400ms) */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.35s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up {
+    animation: none;
+  }
+}
+
+/* Shimmer para skeletons de carga */
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #e8d5d0 25%, #f4e7e3 50%, #e8d5d0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* Oculta el scrollbar en los carruseles horizontales */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
