@@ -99,6 +99,9 @@ export default async function HomePage() {
         <p className="text-[11px] text-muted-foreground/70">
           © 2026 · Todos los derechos reservados.
         </p>
+        <p className="text-[11px] text-muted-foreground/70">
+          Este menú está hecho por Lucio Ingargiola
+        </p>
       </footer>
     </div>
   );
