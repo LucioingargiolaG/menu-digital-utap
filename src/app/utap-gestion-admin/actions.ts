@@ -128,6 +128,59 @@ export async function deleteUserAction(formData: FormData): Promise<void> {
   revalidatePath(`${ADMIN_PATH}/cuentas`);
 }
 
+// Cambio de contraseña propia: exige la actual como verificación
+export async function changeOwnPasswordAction(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await requireSession();
+
+  const currentPassword = String(formData.get("currentPassword") ?? "");
+  const newPassword = String(formData.get("newPassword") ?? "");
+
+  if (newPassword.length < 8) {
+    return { error: "La nueva contraseña necesita al menos 8 caracteres." };
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: session.sub } });
+  if (!user || !(await bcrypt.compare(currentPassword, user.passwordHash))) {
+    return { error: "La contraseña actual es incorrecta." };
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+  return { ok: "Contraseña actualizada." };
+}
+
+// Reset de la contraseña de OTRA cuenta (sin pedir la anterior)
+export async function resetUserPasswordAction(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await requireSession();
+
+  const id = String(formData.get("id") ?? "");
+  const newPassword = String(formData.get("newPassword") ?? "");
+
+  // Para cambiar la propia está el formulario de arriba (pide la actual)
+  if (!id || id === session.sub) {
+    return { error: "Cuenta inválida." };
+  }
+  if (newPassword.length < 8) {
+    return { error: "La nueva contraseña necesita al menos 8 caracteres." };
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  try {
+    await prisma.user.update({ where: { id }, data: { passwordHash } });
+  } catch {
+    return { error: "No se pudo actualizar la contraseña." };
+  }
+
+  revalidatePath(`${ADMIN_PATH}/cuentas`);
+  return { ok: "Contraseña actualizada." };
+}
+
 /* --------------------------- Productos --------------------------- */
 
 export async function saveProductAction(

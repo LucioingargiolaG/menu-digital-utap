@@ -1,11 +1,14 @@
 "use client";
 
-// Gestión de cuentas del panel: alta y baja (revocar acceso)
+// Gestión de cuentas del panel: alta, baja (revocar acceso)
+// y cambio de contraseñas (propia y de otras cuentas).
 import { useActionState } from "react";
-import { Trash2, UserPlus } from "lucide-react";
+import { KeyRound, Trash2, UserPlus } from "lucide-react";
 import {
   createUserAction,
   deleteUserAction,
+  changeOwnPasswordAction,
+  resetUserPasswordAction,
   type ActionState,
 } from "@/app/utap-gestion-admin/actions";
 import { Button } from "@/components/ui/button";
@@ -22,6 +25,8 @@ export type AccountRow = {
 export function AccountManager({ users }: { users: AccountRow[] }) {
   return (
     <div className="flex flex-col gap-6">
+      <OwnPasswordForm />
+
       <CreateForm />
 
       <div className="flex flex-col gap-3">
@@ -39,6 +44,57 @@ function ErrorText({ error }: { error?: string }) {
     <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">
       {error}
     </p>
+  );
+}
+
+function OkText({ ok }: { ok?: string }) {
+  if (!ok) return null;
+  return (
+    <p className="rounded-xl bg-green-50 px-3 py-2 text-sm text-green-700">
+      {ok}
+    </p>
+  );
+}
+
+function OwnPasswordForm() {
+  const [state, formAction, pending] = useActionState(
+    changeOwnPasswordAction,
+    initialState
+  );
+
+  return (
+    <form
+      action={formAction}
+      className="flex flex-wrap items-end gap-3 rounded-2xl border border-border bg-surface p-4 shadow-soft"
+    >
+      <div className="w-full sm:w-auto sm:min-w-40 sm:flex-1">
+        <label className="mb-1 block text-sm font-medium">Tu contraseña</label>
+        <Input
+          name="currentPassword"
+          type="password"
+          required
+          placeholder="Contraseña actual"
+        />
+      </div>
+      <div className="w-full sm:w-auto sm:min-w-40 sm:flex-1">
+        <label className="mb-1 block text-sm font-medium">&nbsp;</label>
+        <Input
+          name="newPassword"
+          type="password"
+          required
+          placeholder="Nueva contraseña"
+          minLength={8}
+        />
+      </div>
+      <Button type="submit" variant="outline" disabled={pending}>
+        <KeyRound className="size-4" />
+        {pending ? "..." : "Cambiar"}
+      </Button>
+      <div className="w-full flex flex-col gap-2">
+        <ErrorText error={state.error} />
+        <OkText ok={state.ok} />
+      </div>
+    </form>
   );
 }
 
@@ -84,6 +140,11 @@ function CreateForm() {
 }
 
 function UserRow({ user }: { user: AccountRow }) {
+  const [resetState, resetFormAction, resetting] = useActionState(
+    resetUserPasswordAction,
+    initialState
+  );
+
   return (
     <div className="rounded-2xl border border-border bg-surface p-4 shadow-soft">
       <div className="flex items-center justify-between gap-3">
@@ -120,6 +181,35 @@ function UserRow({ user }: { user: AccountRow }) {
           </form>
         )}
       </div>
+
+      {/* Reset de contraseña para otras cuentas */}
+      {!user.isCurrentUser && (
+        <details className="mt-3">
+          <summary className="cursor-pointer select-none text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
+            Cambiar contraseña
+          </summary>
+          <form action={resetFormAction} className="mt-3 flex flex-wrap items-end gap-3">
+            <input type="hidden" name="id" value={user.id} />
+            <div className="w-full sm:w-auto sm:min-w-40 sm:flex-1">
+              <Input
+                name="newPassword"
+                type="password"
+                required
+                placeholder="Nueva contraseña"
+                minLength={8}
+              />
+            </div>
+            <Button type="submit" variant="outline" disabled={resetting}>
+              <KeyRound className="size-4" />
+              {resetting ? "..." : "Actualizar"}
+            </Button>
+            <div className="w-full flex flex-col gap-2">
+              <ErrorText error={resetState.error} />
+              <OkText ok={resetState.ok} />
+            </div>
+          </form>
+        </details>
+      )}
     </div>
   );
 }
