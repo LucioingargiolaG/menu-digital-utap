@@ -2,6 +2,50 @@
 
 Menú digital para la hamburguesería **Utap**, pensado para escanear con QR desde el local (dine-in / para retirar). Se abre directo en el menú público, sin login del cliente, con carga ultra rápida en móviles.
 
+## Guía rápida para el dueño
+
+### Tus accesos
+
+| Qué | Dónde |
+| --- | --- |
+| Menú público (lo que ven los clientes) | https://menu-digital-utap.vercel.app |
+| Panel de administración | https://menu-digital-utap.vercel.app/admin |
+| QR imprimible para las mesas | `QR-Utap-Mesas.png` en la raíz del proyecto |
+
+> El usuario y contraseña del panel **no se publican en este repo** (es público). Viven solo en tu `.env` (`ADMIN_USERNAME` / `ADMIN_PASSWORD`) y en tu cabeza.
+
+### Día a día desde el panel
+
+- **Sacar un producto del menú sin borrarlo** → *Productos* → switch de la fila. Queda como inactivo y podés reactivarlo cuando quieras.
+- **Cambiar un precio o descripción** → *Productos* → ícono de lápiz → editás → *Guardar cambios*. Se refleja en el menú al instante.
+- **Crear un producto** → *Nuevo producto*: nombre, descripción, precio, categoría y foto opcional (JPG/PNG/WebP, máx 4 MB).
+- **Ordenar** → cada producto y categoría tiene un campo *Orden* (número más bajo = aparece primero).
+- **Ocultar una categoría entera** → pestaña *Categorías* → destilá *Visible*.
+- **Link de pedidos y horarios** → *Configuración*: pegás el link del sistema de pedidos (si queda vacío, no se muestra el botón), programás horario de apertura/cierre o forzás *Cerrado* para feriados.
+
+### Cambiar la contraseña del panel
+
+```bash
+# Poné la nueva clave en ADMIN_PASSWORD del .env y corré:
+npm run admin:create
+```
+
+Como tu máquina se conecta a la misma base MongoDB Atlas que producción, el cambio aplica **al instante** — no hace falta deployar. Mínimo 8 caracteres.
+
+### Publicar cambios de código
+
+GitHub y Vercel están conectados: cada `git push` a `master` deploya solo (~30 segundos y está live).
+
+```bash
+git add .
+git commit -m "describí el cambio"
+git push
+```
+
+### Si cambia el dominio del menú
+
+Regenerá el QR (`QR-Utap-Mesas.png`), actualizá `metadataBase` en `src/app/layout.tsx`, y avisá para actualizar el preview de WhatsApp.
+
 ## Stack
 
 - **Next.js 16** (App Router) + TypeScript + Tailwind CSS 4
@@ -127,7 +171,7 @@ En **Admin → Configuración** pegá el link del sistema de pedidos que ya usan
 
 ## Código QR
 
-Generá el QR apuntando a la URL pública del menú (la raíz del sitio). Ejemplo: si hospedás en Vercel, `https://utap.tu-dominio.com/`.
+El poster para las mesas ya está generado: `QR-Utap-Mesas.png` (en la raíz del proyecto). Apunta siempre a la raíz del sitio (`/`), nunca a `/admin`. Si cambia el dominio, hay que regenerarlo.
 
 ## Notas de producción
 
