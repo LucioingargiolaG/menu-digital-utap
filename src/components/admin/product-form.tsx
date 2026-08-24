@@ -17,7 +17,7 @@
  */
 import { useActionState, useState } from "react";
 import Image from "next/image";
-import { saveProductAction, type ActionState } from "@/app/admin/actions";
+import { saveProductAction, type ActionState } from "@/app/utap-gestion-admin/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

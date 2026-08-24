@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
+import { ADMIN_PATH } from "@/lib/admin-path";
 import { ProductForm } from "@/components/admin/product-form";
 
 export const metadata = { title: "Editar producto · Utap Admin" };
@@ -24,7 +25,7 @@ export default async function EditProductPage({
   return (
     <div className="mx-auto max-w-xl">
       <Link
-        href="/admin"
+        href={ADMIN_PATH}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />

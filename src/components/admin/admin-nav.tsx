@@ -3,12 +3,13 @@
 // Navegación del panel con estado activo
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ADMIN_PATH } from "@/lib/admin-path";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/admin", label: "Productos" },
-  { href: "/admin/categorias", label: "Categorías" },
-  { href: "/admin/configuracion", label: "Configuración" },
+  { href: ADMIN_PATH, label: "Productos" },
+  { href: `${ADMIN_PATH}/categorias`, label: "Categorías" },
+  { href: `${ADMIN_PATH}/configuracion`, label: "Configuración" },
 ];
 
 export function AdminNav() {
@@ -18,8 +19,8 @@ export function AdminNav() {
     <nav className="scrollbar-none -mx-1 flex gap-1 overflow-x-auto pb-2">
       {links.map((link) => {
         const active =
-          link.href === "/admin"
-            ? pathname === "/admin"
+          link.href === ADMIN_PATH
+            ? pathname === ADMIN_PATH
             : pathname.startsWith(link.href);
         return (
           <Link

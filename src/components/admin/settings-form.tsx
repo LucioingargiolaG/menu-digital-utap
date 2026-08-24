@@ -3,7 +3,7 @@
 // Formulario de configuración general: link de pedidos y horarios
 import { useActionState, useState } from "react";
 import { ExternalLink } from "lucide-react";
-import { saveSettingsAction, type ActionState } from "@/app/admin/actions";
+import { saveSettingsAction, type ActionState } from "@/app/utap-gestion-admin/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

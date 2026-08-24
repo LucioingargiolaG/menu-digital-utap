@@ -8,7 +8,7 @@ import {
   deleteCategoryAction,
   updateCategoryAction,
   type ActionState,
-} from "@/app/admin/actions";
+} from "@/app/utap-gestion-admin/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 

@@ -4,6 +4,7 @@
 // Todas exigen sesión (defensa en profundidad además del proxy).
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import {
@@ -12,6 +13,8 @@ import {
   setSessionCookie,
 } from "@/lib/auth";
 import { deleteUpload, saveUpload } from "@/lib/images";
+import { isBlocked, registerFailure, resetFailures } from "@/lib/rate-limit";
+import { ADMIN_PATH } from "@/lib/admin-path";
 
 export type ActionState = { error?: string };
 
@@ -30,7 +33,7 @@ function normalizeTime(raw: string): string | null {
 // Refresca el menú público y las listas del admin tras cada cambio
 function revalidateMenu() {
   revalidatePath("/");
-  revalidatePath("/admin");
+  revalidatePath(ADMIN_PATH);
 }
 
 /* ------------------------- Autenticación ------------------------- */
@@ -46,20 +49,36 @@ export async function loginAction(
     return { error: "Completá usuario y contraseña." };
   }
 
+  // Anti fuerza bruta: bloqueo por IP tras varios intentos fallidos seguidos.
+  // (x-forwarded-for puede traer una lista; la IP real es el primer valor)
+  const forwardedFor = (await headers()).get("x-forwarded-for") ?? "";
+  const ip = forwardedFor.split(",")[0].trim() || "unknown";
+  const key = `login:${ip}`;
+
+  const blockedSecs = isBlocked(key);
+  if (blockedSecs > 0) {
+    const mins = Math.max(1, Math.ceil(blockedSecs / 60));
+    return {
+      error: `Demasiados intentos fallidos. Probá de nuevo en ${mins} min.`,
+    };
+  }
+
   const user = await prisma.user.findUnique({ where: { username } });
 
   // Comparación con hash bcrypt (nunca guardamos texto plano)
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+    registerFailure(key);
     return { error: "Usuario o contraseña incorrectos." };
   }
 
+  resetFailures(key);
   await setSessionCookie({ sub: user.id, username: user.username });
-  redirect("/admin");
+  redirect(ADMIN_PATH);
 }
 
 export async function logoutAction(): Promise<void> {
   await clearSessionCookie();
-  redirect("/admin/login");
+  redirect(`${ADMIN_PATH}/login`);
 }
 
 /* --------------------------- Productos --------------------------- */
@@ -128,7 +147,7 @@ export async function saveProductAction(
   }
 
   revalidateMenu();
-  redirect("/admin");
+  redirect(ADMIN_PATH);
 }
 
 export async function deleteProductAction(formData: FormData): Promise<void> {
@@ -183,7 +202,7 @@ export async function createCategoryAction(
   }
 
   revalidateMenu();
-  revalidatePath("/admin/categorias");
+  revalidatePath(`${ADMIN_PATH}/categorias`);
   return {};
 }
 
@@ -215,7 +234,7 @@ export async function updateCategoryAction(
   }
 
   revalidateMenu();
-  revalidatePath("/admin/categorias");
+  revalidatePath(`${ADMIN_PATH}/categorias`);
   return {};
 }
 
@@ -236,7 +255,7 @@ export async function deleteCategoryAction(formData: FormData): Promise<void> {
   await Promise.all(category.products.map((p) => deleteUpload(p.imageUrl)));
 
   revalidateMenu();
-  revalidatePath("/admin/categorias");
+  revalidatePath(`${ADMIN_PATH}/categorias`);
 }
 
 /* ------------------------- Configuración ------------------------- */
@@ -278,6 +297,6 @@ export async function saveSettingsAction(
   });
 
   revalidateMenu();
-  revalidatePath("/admin/configuracion");
+  revalidatePath(`${ADMIN_PATH}/configuracion`);
   return {};
 }

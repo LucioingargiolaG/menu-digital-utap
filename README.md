@@ -9,7 +9,7 @@ Menú digital para la hamburguesería **Utap**, pensado para escanear con QR des
 | Qué | Dónde |
 | --- | --- |
 | Menú público (lo que ven los clientes) | https://menu-digital-utap.vercel.app |
-| Panel de administración | https://menu-digital-utap.vercel.app/admin |
+| Panel de administración | https://menu-digital-utap.vercel.app/utap-gestion-admin |
 | QR imprimible para las mesas | `QR-Utap-Mesas.png` en la raíz del proyecto |
 
 > El usuario y contraseña del panel **no se publican en este repo** (es público). Viven solo en tu `.env` (`ADMIN_USERNAME` / `ADMIN_PASSWORD`) y en tu cabeza.
@@ -79,7 +79,7 @@ src/
 │   ├── session.ts            # JWT (edge-safe)
 │   ├── images.ts             # Subida de imágenes
 │   └── availability.ts       # Estado Disponible/Cerrado
-└── proxy.ts                  # Protege /admin (middleware de Next 16)
+└── proxy.ts                  # Protege el panel en su ruta secreta (middleware de Next 16)
 ```
 
 ## Instalación
@@ -128,7 +128,7 @@ npm run dev
 ```
 
 - Menú público: http://localhost:3000
-- Panel admin: http://localhost:3000/admin/login
+- Panel admin: http://localhost:3000/utap-gestion-admin/login
 
 ## Crear o cambiar el usuario admin
 
@@ -157,12 +157,12 @@ npm run admin:create
 
 ## Seguridad del panel
 
-- `/admin/**` está protegida por `src/proxy.ts`: sin sesión válida redirige a `/admin/login`
+- `/utap-gestion-admin/**` está protegida por `src/proxy.ts`: sin sesión válida redirige a `/utap-gestion-admin/login`
 - Doble verificación en el layout del panel (`requireSession`)
 - Contraseña hasheada con bcrypt; nunca se guarda ni compara en texto plano
 - Sesión = JWT HS256 firmado, en cookie **httpOnly** + `sameSite=lax` + `secure` en producción
 - Sin ningún enlace visible al admin desde el menú público
-- El QR de los clientes apunta siempre a la raíz (`/`), nunca a `/admin`
+- El QR de los clientes apunta siempre a la raíz (`/`), nunca a la ruta secreta del panel
 - Las credenciales viven solo en variables de entorno (`.env` está gitignoreado; en producción se cargan desde el panel del hosting)
 
 ## El botón "Pedir ahora"
@@ -171,7 +171,7 @@ En **Admin → Configuración** pegá el link del sistema de pedidos que ya usan
 
 ## Código QR
 
-El poster para las mesas ya está generado: `QR-Utap-Mesas.png` (en la raíz del proyecto). Apunta siempre a la raíz del sitio (`/`), nunca a `/admin`. Si cambia el dominio, hay que regenerarlo.
+El poster para las mesas ya está generado: `QR-Utap-Mesas.png` (en la raíz del proyecto). Apunta siempre a la raíz del sitio (`/`), nunca a la ruta secreta del panel. Si cambia el dominio, hay que regenerarlo.
 
 ## Notas de producción
 

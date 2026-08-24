@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { formatPrice } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { ADMIN_PATH } from "@/lib/admin-path";
 import { ProductRowActions } from "@/components/admin/product-row-actions";
 
 export const metadata = { title: "Productos · Utap Admin" };
@@ -15,7 +16,7 @@ export const metadata = { title: "Productos · Utap Admin" };
  * orden de cada uno) con acciones rápidas por fila:
  * - Switch → activar/desactivar (ocultar del menú sin borrar)
  * - Tacho  → eliminar (con confirmación, borra también la imagen)
- * - Lápiz  → editar en /admin/productos/[id]
+ * - Lápiz  → editar en la ruta secreta (ver src/lib/admin-path.ts)
  */
 export default async function AdminProductsPage() {
   const [categories, products] = await Promise.all([
@@ -39,7 +40,7 @@ export default async function AdminProductsPage() {
           </p>
         </div>
         <Link
-          href="/admin/productos/nuevo"
+          href={`${ADMIN_PATH}/productos/nuevo`}
           className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary-hover active:scale-[0.98]"
         >
           <Plus className="size-4" />
@@ -51,7 +52,7 @@ export default async function AdminProductsPage() {
       {categories.length === 0 ? (
         <Card className="p-8 text-center text-sm text-muted-foreground">
           Primero creá una categoría en la pestaña{" "}
-          <Link href="/admin/categorias" className="font-medium text-primary underline underline-offset-2">
+          <Link href={`${ADMIN_PATH}/categorias`} className="font-medium text-primary underline underline-offset-2">
             Categorías
           </Link>
           .
@@ -110,7 +111,7 @@ export default async function AdminProductsPage() {
                       />
 
                       <Link
-                        href={`/admin/productos/${product.id}/editar`}
+                        href={`${ADMIN_PATH}/productos/${product.id}/editar`}
                         aria-label={`Editar ${product.name}`}
                         className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                       >

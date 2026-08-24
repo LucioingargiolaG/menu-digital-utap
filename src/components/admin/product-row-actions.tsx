@@ -5,7 +5,7 @@ import { Trash2 } from "lucide-react";
 import {
   deleteProductAction,
   toggleProductAction,
-} from "@/app/admin/actions";
+} from "@/app/utap-gestion-admin/actions";
 import { Switch } from "@/components/ui/switch";
 
 export function ProductRowActions({

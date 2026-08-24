@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { ExternalLink, LogOut } from "lucide-react";
 import { Toaster } from "sonner";
 import { requireSession } from "@/lib/auth";
-import { logoutAction } from "@/app/admin/actions";
+import { logoutAction } from "@/app/utap-gestion-admin/actions";
 import { AdminNav } from "@/components/admin/admin-nav";
 import { Button } from "@/components/ui/button";
 

@@ -8,6 +8,7 @@ import {
   verifySessionToken,
   type SessionPayload,
 } from "@/lib/session";
+import { ADMIN_PATH } from "@/lib/admin-path";
 
 // Lee la sesión actual desde la cookie httpOnly
 export async function getSession(): Promise<SessionPayload | null> {
@@ -37,6 +38,6 @@ export async function clearSessionCookie() {
 // Para páginas/acciones del panel: exige sesión o redirige al login
 export async function requireSession(): Promise<SessionPayload> {
   const session = await getSession();
-  if (!session) redirect("/admin/login");
+  if (!session) redirect(`${ADMIN_PATH}/login`);
   return session;
 }

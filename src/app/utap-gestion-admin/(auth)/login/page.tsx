@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import { ADMIN_PATH } from "@/lib/admin-path";
 import { LoginForm } from "@/components/admin/login-form";
 
 export const metadata = { title: "Admin · Utap" };
@@ -9,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 // Página de login: si ya hay sesión, directo al panel
 export default async function LoginPage() {
-  if (await getSession()) redirect("/admin");
+  if (await getSession()) redirect(ADMIN_PATH);
 
   return (
     <div className="flex min-h-svh items-center justify-center bg-background px-4">

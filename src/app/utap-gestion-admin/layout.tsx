@@ -1,4 +1,4 @@
-// Layout raíz de todo /admin (login + panel).
+// Layout raíz del panel de gestión (login + panel).
 // Solo aporta metadata: previews con la marca cuando se comparte el link,
 // y noindex para que el panel no aparezca en buscadores.
 import type { Metadata } from "next";

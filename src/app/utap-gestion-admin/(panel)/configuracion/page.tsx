@@ -36,8 +36,8 @@ export default async function SettingsPage() {
           <code className="rounded bg-surface px-1.5 py-0.5 text-xs">
             https://tu-dominio.com/
           </code>
-          ). Nunca apunta a /admin: esa ruta solo es accesible con usuario y
-          contraseña.
+          ). Nunca apunta al panel: esa ruta secreta solo es accesible con
+          usuario y contraseña.
         </p>
       </div>
     </div>
