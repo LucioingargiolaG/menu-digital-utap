@@ -30,38 +30,38 @@ const categories: { name: string; order: number; products: SeedProduct[] }[] = [
       {
         name: "Classic Simple",
         description:
-          "Carne, cheddar, lechuga, tomate, cebolla y salsa clásica de la casa.",
+          "Medallón de carne, cheddar, lechuga, tomate, cebolla y salsa clásica de la casa.",
         price: 13500,
         order: 1,
       },
       {
         name: "Cheeseburger Simple",
-        description: "Carne, doble cheddar, cebolla y salsa cheese.",
+        description: "Medallón de carne, doble cheddar, cebolla y salsa cheese.",
         price: 13500,
         order: 2,
       },
       {
         name: "Smoked Tap Simple",
         description:
-          "Carne, cheddar, panceta ahumada, cebolla crispy y salsa Utap.",
+          "Medallón de carne, cheddar, panceta ahumada, cebolla crispy y salsa Utap.",
         price: 13500,
         order: 3,
       },
       {
         name: "Tipo Cuarto Simple",
-        description: "Estilo cuarto de libra: carne, cheddar y cebolla.",
+        description: "Estilo cuarto de libra: medallón de carne, cheddar y cebolla.",
         price: 13500,
         order: 4,
       },
       {
         name: "Baconness Simple",
-        description: "Carne, cheddar, panceta crocante y salsa bacon.",
+        description: "Medallón de carne, cheddar, panceta crocante y salsa bacon.",
         price: 14000,
         order: 5,
       },
       {
         name: "Big Tap Simple",
-        description: "Carne, doble cheddar, pepinillos y salsa Big Tap.",
+        description: "Medallón de carne, doble cheddar, pepinillos y salsa Big Tap.",
         price: 14000,
         order: 6,
       },
@@ -73,39 +73,39 @@ const categories: { name: string; order: number; products: SeedProduct[] }[] = [
     products: [
       {
         name: "Tipo Cuarto Doble",
-        description: "Doble carne, cheddar y cebolla. Estilo cuarto de libra.",
+        description: "Doble medallón de carne, cheddar y cebolla. Estilo cuarto de libra.",
         price: 14500,
         order: 1,
       },
       {
         name: "Cheeseburger Doble",
-        description: "Doble carne, doble cheddar, cebolla y salsa cheese.",
+        description: "Doble medallón de carne, doble cheddar, cebolla y salsa cheese.",
         price: 15500,
         order: 2,
       },
       {
         name: "Classic Doble",
         description:
-          "Doble carne, cheddar, lechuga, tomate, cebolla y salsa clásica.",
+          "Doble medallón de carne, cheddar, lechuga, tomate, cebolla y salsa clásica.",
         price: 16000,
         order: 3,
       },
       {
         name: "Baconness Doble",
-        description: "Doble carne, cheddar, panceta crocante y salsa bacon.",
+        description: "Doble medallón de carne, cheddar, panceta crocante y salsa bacon.",
         price: 16000,
         order: 4,
       },
       {
         name: "Big Tap Doble",
-        description: "Doble carne, doble cheddar, pepinillos y salsa Big Tap.",
+        description: "Doble medallón de carne, doble cheddar, pepinillos y salsa Big Tap.",
         price: 16500,
         order: 5,
       },
       {
         name: "Smoked Tap Doble",
         description:
-          "Doble carne, cheddar, panceta ahumada, cebolla crispy y salsa Utap.",
+          "Doble medallón de carne, cheddar, panceta ahumada, cebolla crispy y salsa Utap.",
         price: 16500,
         order: 6,
       },
@@ -117,39 +117,39 @@ const categories: { name: string; order: number; products: SeedProduct[] }[] = [
     products: [
       {
         name: "Baconness Triple",
-        description: "Triple carne, cheddar, panceta crocante y salsa bacon.",
+        description: "Triple medallón de carne, cheddar, panceta crocante y salsa bacon.",
         price: 17000,
         order: 1,
       },
       {
         name: "Cheeseburger Triple",
-        description: "Triple carne, doble cheddar, cebolla y salsa cheese.",
+        description: "Triple medallón de carne, doble cheddar, cebolla y salsa cheese.",
         price: 17000,
         order: 2,
       },
       {
         name: "Classic Triple",
         description:
-          "Triple carne, cheddar, lechuga, tomate, cebolla y salsa clásica.",
+          "Triple medallón de carne, cheddar, lechuga, tomate, cebolla y salsa clásica.",
         price: 17000,
         order: 3,
       },
       {
         name: "Tipo Cuarto Triple",
-        description: "Triple carne, cheddar y cebolla. Estilo cuarto de libra.",
+        description: "Triple medallón de carne, cheddar y cebolla. Estilo cuarto de libra.",
         price: 17000,
         order: 4,
       },
       {
         name: "Big Tap Triple",
-        description: "Triple carne, doble cheddar, pepinillos y salsa Big Tap.",
+        description: "Triple medallón de carne, doble cheddar, pepinillos y salsa Big Tap.",
         price: 17500,
         order: 5,
       },
       {
         name: "Smoked Tap Triple",
         description:
-          "Triple carne, cheddar, panceta ahumada, cebolla crispy y salsa Utap.",
+          "Triple medallón de carne, cheddar, panceta ahumada, cebolla crispy y salsa Utap.",
         price: 17500,
         order: 6,
       },
