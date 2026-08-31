@@ -1,85 +1,81 @@
-# Utap · Menú Digital
+# Utap - Menú Digital
 
-Menú digital para la hamburguesería **Utap**, pensado para escanear con QR desde el local (dine-in / para retirar). Se abre directo en el menú público, sin login del cliente, con carga ultra rápida en móviles.
+Menú digital para la hamburguesería **Utap**, diseñado para escanear con código QR desde el local. Los clientes acceden directamente al menú público sin necesidad de login, con carga ultra rápida en dispositivos móviles.
 
-## Guía rápida para el dueño
+## Enlaces de acceso
 
-### Tus accesos
-
-| Qué | Dónde |
+| Sección | URL |
 | --- | --- |
-| Menú público (lo que ven los clientes) | https://menu-digital-utap.vercel.app |
+| Menú público (clientes) | https://menu-digital-utap.vercel.app |
 | Panel de administración | https://menu-digital-utap.vercel.app/utap-gestion-admin |
-| QR imprimible para las mesas | `QR-Utap-Mesas.png` en la raíz del proyecto |
 
-> El usuario y contraseña del panel **no se publican en este repo** (es público). Viven solo en tu `.env` (`ADMIN_USERNAME` / `ADMIN_PASSWORD`) y en tu cabeza.
+**Nota de seguridad:** El panel de administración está protegido por autenticación. Las credenciales (usuario y contraseña) nunca se publican en el repositorio ni se muestran en esta documentación. Solo se almacenan en variables de entorno (`.env`) en el servidor de producción.
 
-### Día a día desde el panel
+### Menú público
 
-- **Sacar un producto del menú sin borrarlo** → *Productos* → switch de la fila. Queda como inactivo y podés reactivarlo cuando quieras.
-- **Cambiar un precio o descripción** → *Productos* → ícono de lápiz → editás → *Guardar cambios*. Se refleja en el menú al instante.
-- **Crear un producto** → *Nuevo producto*: nombre, descripción, precio, categoría y foto opcional (JPG/PNG/WebP, máx 4 MB).
-- **Ordenar** → cada producto y categoría tiene un campo *Orden* (número más bajo = aparece primero).
-- **Ocultar una categoría entera** → pestaña *Categorías* → destilá *Visible*.
-- **Link de pedidos y horarios** → *Configuración*: pegás el link del sistema de pedidos (si queda vacío, no se muestra el botón), programás horario de apertura/cierre o forzás *Cerrado* para feriados.
+El enlace principal (`/`) muestra el menú completo de la hamburguesería con todas las categorías y productos activos. Incluye:
 
-### Cambiar la contraseña del panel
+- Navegación por categorías con filtros horizontales
+- Lista de productos con nombre, descripción, precio e imagen (opcional)
+- Botón "Hacer pedido" que redirige al sistema de pedidos externo (configurable desde el panel admin)
 
-```bash
-# Poné la nueva clave en ADMIN_PASSWORD del .env y corré:
-npm run admin:create
-```
+### Panel de administración
 
-Como tu máquina se conecta a la misma base MongoDB Atlas que producción, el cambio aplica **al instante** — no hace falta deployar. Mínimo 8 caracteres.
+El enlace `/utap-gestion-admin` lleva al panel de gestión donde el dueño puede:
 
-### Publicar cambios de código
+- Crear, editar y eliminar productos
+- Gestionar categorías y su orden de aparición
+- Activar/desactivar productos sin borrarlos
+- Configurar el link del sistema de pedidos
+- Establecer horarios de apertura y cierre
+- Cambiar la contraseña de administrador
 
-GitHub y Vercel están conectados: cada `git push` a `master` deploya solo (~30 segundos y está live).
+**Ruta protegida:** Sin sesión válida, el sistema redirige automáticamente al formulario de login. El panel no tiene enlaces visibles desde el menú público.
 
-```bash
-git add .
-git commit -m "describí el cambio"
-git push
-```
+## Tecnologías utilizadas
 
-### Si cambia el dominio del menú
+| Tecnología | Función |
+| --- | --- |
+| **Next.js 16** | Framework React con App Router. Maneja el enrutamiento, generación de HTML (ISR con revalidación cada 30s), Server Components y Server Actions para el CRUD del panel admin |
+| **TypeScript** | Añade tipado estático a JavaScript. Detecta errores en tiempo de compilación, mejora la autocompletación del IDE y documenta los tipos de datos (categorías, productos, configuración) |
+| **Tailwind CSS 4** | Framework de utilidades CSS. Permite diseñar la interfaz del menú y el panel admin con clases utilitarias直接 en el markup, sin crear archivos CSS separados |
+| **Prisma 6** | ORM para MongoDB. Define el esquema de base de datos (usuarios, categorías, productos, configuración), genera el cliente tipado y ejecuta migraciones con `prisma db push` |
+| **MongoDB Atlas** | Base de datos NoSQL en la nube. Almacena las categorías, productos, configuración y credenciales del administrador. Se conecta mediante el connection string en `DATABASE_URL` |
+| **bcryptjs** | Librería de hashing de contraseñas. Encripta la contraseña del administrador con algoritmo bcrypt (12 rounds) antes de guardarla en la base de datos |
+| **jose** | Librería para JWT (JSON Web Tokens). Genera y verifica tokens de sesión firmados con HS256, almacenados en cookies httpOnly para proteger el panel admin |
+| **React 19** | Librería de interfaces de usuario. Next.js lo usa internamente para renderizar componentes de servidor y cliente (menú interactivo, formularios del admin) |
+| **Lucide React** | Librería de íconos. Proporciona los íconos SVG utilizados en el panel de administración y elementos de la interfaz |
+| **ESLint** | Herramienta de linting. Analiza el código en busca de errores potenciales y inconsistencias de estilo según las reglas configuradas en `eslint.config.mjs` |
 
-Regenerá el QR (`QR-Utap-Mesas.png`), actualizá `metadataBase` en `src/app/layout.tsx`, y avisá para actualizar el preview de WhatsApp.
-
-## Stack
-
-- **Next.js 16** (App Router) + TypeScript + Tailwind CSS 4
-- **Prisma 6** + **MongoDB Atlas**
-- Autenticación propia: bcrypt + JWT firmado en cookie **httpOnly**
-- Server Actions para todo el CRUD del panel
-- Imágenes optimizadas a WebP por `next/image` (lazy loading)
-
-## Estructura
+## Estructura del proyecto
 
 ```
 src/
 ├── app/
-│   ├── page.tsx              # Menú público (ISR 30s)
-│   ├── loading.tsx           # Skeleton con shimmer
-│   └── admin/
-│       ├── actions.ts        # Server Actions (login, CRUD, config)
-│       ├── (auth)/login/     # Login público del panel
-│       └── (panel)/          # Panel protegido
-│           ├── page.tsx      # Productos (dashboard)
-│           ├── productos/    # Alta y edición
+│   ├── page.tsx              # Menú público (Server Component, ISR 30s)
+│   ├── loading.tsx           # Skeleton con efecto shimmer mientras carga
+│   └── utap-gestion-admin/
+│       ├── actions.ts        # Server Actions (login, CRUD de productos/categorías, configuración)
+│       ├── (auth)/login/     # Página de login del panel admin
+│       └── (panel)/          # Secciones del panel protegido
+│           ├── page.tsx      # Dashboard de productos
+│           ├── productos/    # Alta y edición de productos
 │           ├── categorias/   # Gestión de categorías
-│           └── configuracion/# Link pedidos + horarios
+│           └── configuracion/# Link de pedidos y horarios
 ├── components/
-│   ├── menu/                 # Vista interactiva del menú
-│   ├── admin/                # Formularios del panel
-│   └── ui/                   # Componentes base (estilo shadcn)
+│   ├── menu/                 # Componentes del menú público (vista interactiva, cards de productos)
+│   ├── admin/                # Formularios del panel (CRUD de productos, categorías, configuración)
+│   └── ui/                   # Componentes base reutilizables (estilo shadcn)
 ├── lib/
-│   ├── db.ts                 # Cliente Prisma (singleton)
-│   ├── auth.ts               # Sesión server-side
-│   ├── session.ts            # JWT (edge-safe)
-│   ├── images.ts             # Subida de imágenes
-│   └── availability.ts       # Estado Disponible/Cerrado
-└── proxy.ts                  # Protege el panel en su ruta secreta (middleware de Next 16)
+│   ├── db.ts                 # Cliente Prisma (singleton para conexión a MongoDB)
+│   ├── auth.ts               # Lógica de autenticación server-side
+│   ├── session.ts            # Manejo de JWT (edge-safe con jose)
+│   ├── images.ts             # Lógica de subida y optimización de imágenes
+│   └── availability.ts       # Verificación de horarios (abierto/cerrado)
+├── proxy.ts                  # Middleware que protege la ruta secreta del panel admin
+└── prisma/
+    ├── schema.prisma         # Esquema de la base de datos (User, Category, Product, Settings)
+    └── seed.ts               # Script para cargar datos iniciales (categorías, productos, admin)
 ```
 
 ## Instalación
@@ -92,21 +88,19 @@ npm install
 cp .env.example .env
 ```
 
-Editá `.env`:
+Editá `.env` con tus valores:
 
 ```env
-# Connection string de MongoDB Atlas (con el nombre de la base al final)
+# MongoDB Atlas: connection string con nombre de base al final
 DATABASE_URL="mongodb+srv://usuario:password@cluster0.xxxxx.mongodb.net/utap-menu?retryWrites=true&w=majority"
 
-# Secreto para firmar sesiones (generá uno con el comando de abajo)
+# Secreto para firmar sesiones JWT
 AUTH_SECRET="..."
 
-# Credenciales del admin
+# Credenciales del usuario admin
 ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="una-clave-larga-y-segura"
 ```
-
-> **Importante:** en Atlas → Network Access, permití la IP del servidor donde corra la app (o `0.0.0.0/0`).
 
 Generar un `AUTH_SECRET` fuerte:
 
@@ -118,11 +112,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 # 3. Crear las colecciones y cargar los productos iniciales
 npx prisma db push
 npm run db:seed
-```
 
-El seed carga las 4 categorías (Papas Fritas, Hamburguesas Simples/Dobles/Triples), los 19 productos de las capturas, la configuración inicial y el usuario admin.
-
-```bash
 # 4. Desarrollo
 npm run dev
 ```
@@ -130,50 +120,34 @@ npm run dev
 - Menú público: http://localhost:3000
 - Panel admin: http://localhost:3000/utap-gestion-admin/login
 
-## Crear o cambiar el usuario admin
+## Comandos disponibles
 
-El admin se crea desde variables de entorno (nunca en el código):
+| Comando | Descripción |
+| --- | --- |
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm start` | Servidor de producción |
+| `npm run lint` | ESLint |
+| `npm run db:push` | Sincronizar esquema con la base de datos |
+| `npm run db:seed` | Cargar productos, categorías y configuración inicial |
+| `npm run admin:create` | Crear o actualizar el usuario administrador |
 
-```bash
-npm run admin:create
-```
+## Seguridad
 
-- Usa `ADMIN_USERNAME` y `ADMIN_PASSWORD` del `.env`
-- La contraseña se guarda hasheada con **bcrypt** (12 rounds)
-- Si ya existe, actualiza la contraseña
-- Mínimo 8 caracteres
-
-## Scripts
-
-| Comando                | Qué hace                                  |
-| ---------------------- | ----------------------------------------- |
-| `npm run dev`          | Servidor de desarrollo                    |
-| `npm run build`        | Build de producción                       |
-| `npm start`            | Servidor de producción                    |
-| `npm run lint`         | ESLint                                    |
-| `npm run db:push`      | Sincroniza el schema con la base          |
-| `npm run db:seed`      | Carga productos/categorías/config inicial |
-| `npm run admin:create` | Crea/actualiza el usuario admin           |
-
-## Seguridad del panel
-
-- `/utap-gestion-admin/**` está protegida por `src/proxy.ts`: sin sesión válida redirige a `/utap-gestion-admin/login`
+- La ruta del panel admin (`/utap-gestion-admin`) está protegida por `src/proxy.ts`: sin sesión válida redirige al login
 - Doble verificación en el layout del panel (`requireSession`)
 - Contraseña hasheada con bcrypt; nunca se guarda ni compara en texto plano
-- Sesión = JWT HS256 firmado, en cookie **httpOnly** + `sameSite=lax` + `secure` en producción
-- Sin ningún enlace visible al admin desde el menú público
-- El QR de los clientes apunta siempre a la raíz (`/`), nunca a la ruta secreta del panel
-- Las credenciales viven solo en variables de entorno (`.env` está gitignoreado; en producción se cargan desde el panel del hosting)
+- Sesión = JWT HS256 firmado en cookie httpOnly + sameSite=lax + secure en producción
+- Sin enlaces visibles al panel desde el menú público
+- El QR de los clientes apunta siempre a la raíz (`/`), nunca a la ruta del panel
+- Las credenciales viven solo en variables de entorno (`.env` está gitignoreado)
 
-## El botón "Pedir ahora"
+## Producción
 
-En **Admin → Configuración** pegá el link del sistema de pedidos que ya usan (Ej: `https://...`). El botón sticky del menú lo abre en pestaña nueva. Si el campo queda vacío, el botón no se muestra.
+- Despliegue automático: cada `git push` a `master` activa el build en Vercel (~30 segundos)
+- Las imágenes subidas se guardan en `public/uploads/` (para hostings con disco persistente)
+- El menú usa ISR (30s): los cambios del panel se reflejan al instante mediante `revalidatePath`
 
-## Código QR
+---
 
-El poster para las mesas ya está generado: `QR-Utap-Mesas.png` (en la raíz del proyecto). Apunta siempre a la raíz del sitio (`/`), nunca a la ruta secreta del panel. Si cambia el dominio, hay que regenerarlo.
-
-## Notas de producción
-
-- Las imágenes subidas se guardan en `public/uploads/`. En hostings sin disco persistente (Vercel) conviene migrar a un storage externo (Cloudinary, S3) — la lógica está centralizada en `src/lib/images.ts`.
-- El menú usa ISR (30s): los cambios del panel se reflejan al instante (`revalidatePath`) y cada visita sirve HTML cacheado → carga casi instantánea.
+*Desarrollado por Lucio Ingargiola*
