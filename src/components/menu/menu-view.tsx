@@ -11,7 +11,7 @@
  * Sin modos de pedido ni pasos extra: solo mirar, y si quieren pedir,
  * el botón "Hacer pedido" los lleva al sistema existente.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { cn, formatPrice } from "@/lib/utils";
 
@@ -32,8 +32,13 @@ export function MenuView({
   categories: MenuCategory[];
   products: MenuItem[];
 }) {
-  // Filtro por categoría ("all" = mostrar todo)
+  const [loaded, setLoaded] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | "all">("all");
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), 350);
+    return () => clearTimeout(t);
+  }, []);
 
   // Filtrado en memoria: sin red, sin esperas. Se recalcula solo si
   // cambian los productos o la categoría seleccionada.
@@ -59,6 +64,16 @@ export function MenuView({
 
   return (
     <div>
+      {/* Overlay spinner: círculo rojo girando mientras carga la primera vez */}
+      {!loaded && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3">
+            <div className="size-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+            <p className="text-sm text-muted-foreground">Cargando menú…</p>
+          </div>
+        </div>
+      )}
+
       {/* Categorías horizontales (scroll lateral sin scrollbar visible).
           touch-pan-x + overscroll-x-contain: el gesto sobre los chips queda
           aislado → deslizar el carrusel no scrollea ni mueve la página. */}
