@@ -13,7 +13,14 @@ import {
   setSessionCookie,
 } from "@/lib/auth";
 import { deleteUpload, saveUpload } from "@/lib/images";
-import { isBlocked, registerFailure, resetFailures } from "@/lib/rate-limit";
+import {
+  isBlockedCombined,
+  registerFailureCombined,
+  resetFailuresCombined,
+  createAttemptsCookie,
+  verifyAttemptsCookie,
+} from "@/lib/rate-limit";
+import { cookies } from "next/headers";
 import { ADMIN_PATH } from "@/lib/admin-path";
 
 export type ActionState = { error?: string; ok?: string };
@@ -38,6 +45,8 @@ function revalidateMenu() {
 
 /* ------------------------- Autenticación ------------------------- */
 
+const ATTEMPTS_COOKIE = "utap_login_attempts";
+
 export async function loginAction(
   _prev: ActionState,
   formData: FormData
@@ -55,7 +64,12 @@ export async function loginAction(
   const ip = forwardedFor.split(",")[0].trim() || "unknown";
   const key = `login:${ip}`;
 
-  const blockedSecs = isBlocked(key);
+  // Verificar AMBAS capas (memoria + cookie)
+  const store = await cookies();
+  const cookieValue = store.get(ATTEMPTS_COOKIE)?.value;
+  const cookieFailures = await verifyAttemptsCookie(cookieValue);
+
+  const blockedSecs = isBlockedCombined(key, cookieFailures);
   if (blockedSecs > 0) {
     const mins = Math.max(1, Math.ceil(blockedSecs / 60));
     return {
@@ -67,11 +81,22 @@ export async function loginAction(
 
   // Comparación con hash bcrypt (nunca guardamos texto plano)
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-    registerFailure(key);
+    // Registrar fallo en AMBAS capas
+    const updatedFailures = registerFailureCombined(key, cookieFailures);
+    const cookieToken = await createAttemptsCookie(updatedFailures);
+    store.set(ATTEMPTS_COOKIE, cookieToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 900, // 15 minutos
+    });
     return { error: "Usuario o contraseña incorrectos." };
   }
 
-  resetFailures(key);
+  // Login exitoso: limpiar intentos
+  resetFailuresCombined(key);
+  store.delete(ATTEMPTS_COOKIE);
   await setSessionCookie({ sub: user.id, username: user.username });
   redirect(ADMIN_PATH);
 }
